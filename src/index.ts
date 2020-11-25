@@ -2,7 +2,7 @@ import express from 'express';
 import { Logger } from '@luca_scorpion/tinylogger';
 import { PORT } from './constants';
 import { getAgents, registerAgent } from './agents';
-import cors from './cors';
+import { cors } from './cors';
 
 const log = new Logger('index');
 log.debug('Starting discovery server...');

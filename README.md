@@ -48,6 +48,8 @@ Send a `POST` request to `/api/agents`, with the agent information as JSON in th
 
 This will return the list of known agents in the local network (see "List the Agents" above).
 
+If the agent address is the same as the address of a known agent, the known agent will be replaced with the new one.
+
 ## Configuration
 
 The discovery server can be configured through environment variables.
