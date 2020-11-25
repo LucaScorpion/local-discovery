@@ -1,5 +1,9 @@
 # Local Discovery
 
+[![Docker Image Version](https://img.shields.io/docker/v/lucascorpion/local-discovery?sort=semver)](https://hub.docker.com/r/lucascorpion/local-discovery)
+[![Docker Image Size](https://img.shields.io/docker/image-size/lucascorpion/local-discovery?sort=semver)](https://hub.docker.com/r/lucascorpion/local-discovery)
+[![Docker Pulls](https://img.shields.io/docker/pulls/lucascorpion/local-discovery)](https://hub.docker.com/r/lucascorpion/local-discovery)
+
 A simple API which can be used to discover agents in a local network.
 
 ## Using the API
