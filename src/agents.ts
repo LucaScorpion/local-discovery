@@ -15,7 +15,7 @@ interface AgentWithTimeout extends AgentInfo {
 
 /**
  * The agent registry.
- * This contains all known agents by public ip.
+ * This contains all known agents by public IP.
  */
 const agents: { [publicIp: string]: AgentWithTimeout[] } = {};
 
