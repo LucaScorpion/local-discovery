@@ -12,7 +12,7 @@ All endpoints only expose agents in the same network as the request origin, base
 |------------|-------------|
 | `name`     | The name of the agent application. This will likely be the same for all agents.
 | `version`  | The version of the agent application.
-| `address`  | The local address (ip and port) at which the agent is running.
+| `address`  | The local address (IP and port) at which the agent is running.
 | `platform` | The platform the agent is running on, e.g. `windows`, `linux` or `mac`.
 | `hostname` | The name of the host the agent is running on.
 
