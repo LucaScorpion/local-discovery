@@ -1,12 +1,15 @@
 {
   "name": "local-discovery",
   "version": "1.0.0",
+  "description": "Simple agent discovery in your local network",
+  "homepage": "https://github.com/LucaScorpion/local-discovery",
+  "license": "MIT",
   "main": "src/index.ts",
+  "repository": "github:LucaScorpion/local-discovery",
   "scripts": {
     "start": "ts-node-dev --respawn src/index.ts",
-    "build:tsc": "rimraf build && tsc",
-    "build:docker": "docker build -t lucascorpion/${npm_package_name}:${npm_package_version} .",
-    "build": "npm run build:tsc && npm run build:docker",
+    "build:docker": "docker build -t lucascorpion/${npm_package_name}:dev .",
+    "build": "tsc",
     "prettier": "prettier --write \"src/**/*.(ts)\"",
     "lint": "eslint . --ext .ts --fix",
     "format": "npm run prettier && npm run lint"
@@ -22,7 +25,6 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.22.0",
     "prettier": "^2.0.5",
-    "rimraf": "^3.0.2",
     "ts-node": "^8.10.2",
     "ts-node-dev": "^1.0.0-pre.57",
     "typescript": "^3.9.7"
