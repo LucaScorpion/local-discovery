@@ -10,5 +10,5 @@ import { Request } from 'express';
  */
 export function getRequestIp(req: Request): string {
   // Make sure the IP address is always the same when coming from localhost.
-  return req.ip === '::1' ? '::ffff:127.0.0.1' : req.ip;
+  return req.ip === '::ffff:127.0.0.1' ? '::1' : req.ip;
 }
