@@ -11,6 +11,7 @@ export function apiRegisterAgent(
   req: Request,
   res: Response<AgentInfo[]>
 ): void {
+  // TODO: body validation
   const info: AgentInfo = req.body;
   const requestIp = getRequestIp(req);
 
@@ -18,6 +19,7 @@ export function apiRegisterAgent(
   removeAgent(requestIp, info.address);
   registerAgent(requestIp, info);
 
+  res.status(201);
   apiGetAgents(req, res);
 }
 

@@ -5,6 +5,16 @@ import { app } from './app';
 import { registerAgent, removeAgent } from './agentRegistry';
 import { AgentInfo } from './AgentInfo';
 
+function randomAgent(): AgentInfo {
+  return {
+    name: Math.random().toString().substring(2),
+    version: Math.round(Math.random() * 10).toString(),
+    address: Math.random().toString().substring(2),
+    platform: 'test',
+    hostname: Math.random().toString().substring(2),
+  };
+}
+
 describe('api', (): void => {
   describe('GET /api/agents', (): void => {
     it('returns an empty list if no agents are registered', async (): Promise<void> => {
@@ -16,29 +26,11 @@ describe('api', (): void => {
     });
 
     it('returns all registered agents for the request ip', async (): Promise<void> => {
-      const agentOne: AgentInfo = {
-        name: 'one',
-        version: '1.1.1',
-        address: '192.168.1.1',
-        platform: 'linux',
-        hostname: 'test',
-      };
+      const agentOne = randomAgent();
       registerAgent('::1', agentOne);
-      const agentTwo: AgentInfo = {
-        name: 'two',
-        version: '1.2.0',
-        address: '192.168.1.2',
-        platform: 'windows',
-        hostname: 'another',
-      };
+      const agentTwo = randomAgent();
       registerAgent('::1', agentTwo);
-      const agentThree: AgentInfo = {
-        name: 'three',
-        version: '2.0.2',
-        address: '10.0.0.10',
-        platform: 'mac',
-        hostname: 'nope',
-      };
+      const agentThree = randomAgent();
       registerAgent('6.7.8.9', agentThree);
 
       try {
@@ -48,9 +40,47 @@ describe('api', (): void => {
           .expect('Content-Type', 'application/json; charset=utf-8')
           .expect([agentOne, agentTwo]);
       } finally {
-        removeAgent('::1', '192.168.1.1');
-        removeAgent('::1', '192.168.1.2');
-        removeAgent('6.7.8.9', '10.0.0.10');
+        removeAgent('::1', agentOne.address);
+        removeAgent('::1', agentTwo.address);
+        removeAgent('6.7.8.9', agentThree.address);
+      }
+    });
+  });
+
+  describe('POST /api/agents', () => {
+    it('registers a new agent and returns all agents', async (): Promise<void> => {
+      const agent = randomAgent();
+
+      try {
+        await request(app)
+          .post('/api/agents')
+          .send(agent)
+          .expect(201)
+          .expect('Content-Type', 'application/json; charset=utf-8')
+          .expect([agent]);
+      } finally {
+        removeAgent('::1', agent.address);
+      }
+    });
+
+    it('overwrites an existing agent with the same address', async (): Promise<void> => {
+      const oldAgent = randomAgent();
+      registerAgent('::1', oldAgent);
+      const newAgent = randomAgent();
+      newAgent.address = oldAgent.address;
+      const otherAgent = randomAgent();
+      registerAgent('::1', otherAgent);
+
+      try {
+        await request(app)
+          .post('/api/agents')
+          .send(newAgent)
+          .expect(201)
+          .expect('Content-Type', 'application/json; charset=utf-8')
+          .expect([otherAgent, newAgent]);
+      } finally {
+        removeAgent('::1', newAgent.address);
+        removeAgent('::1', otherAgent.address);
       }
     });
   });
