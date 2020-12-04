@@ -2,7 +2,7 @@ import express from 'express';
 import { Logger } from '@luca_scorpion/tinylogger';
 import { AddressInfo } from 'net';
 import { PORT } from './constants';
-import { apiGetAgents, apiRegisterAgent } from './api';
+import { apiDeleteAgent, apiGetAgents, apiRegisterAgent } from './api';
 import { cors } from './cors';
 
 const log = new Logger('index');
@@ -17,6 +17,7 @@ async function bootstrap(): Promise<void> {
   // API routes.
   app.get('/api/agents', apiGetAgents);
   app.post('/api/agents', apiRegisterAgent);
+  app.delete('/api/agents/:address', apiDeleteAgent);
 
   // Done!
   const server = app.listen(PORT, () => {

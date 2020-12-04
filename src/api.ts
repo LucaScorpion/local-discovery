@@ -20,3 +20,8 @@ export function apiRegisterAgent(
 
   apiGetAgents(req, res);
 }
+
+export function apiDeleteAgent(req: Request, res: Response<AgentInfo[]>): void {
+  removeAgent(getRequestIp(req), req.params.address);
+  apiGetAgents(req, res);
+}
