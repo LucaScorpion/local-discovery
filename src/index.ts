@@ -1,7 +1,7 @@
 import express from 'express';
 import { Logger } from '@luca_scorpion/tinylogger';
 import { PORT } from './constants';
-import { getAgents, registerAgent } from './agents';
+import { apiGetAgents, apiRegisterAgent } from './api';
 import { cors } from './cors';
 
 const log = new Logger('index');
@@ -14,8 +14,8 @@ async function bootstrap(): Promise<void> {
   app.use(cors);
 
   // API routes.
-  app.get('/api/agents', getAgents);
-  app.post('/api/agents', registerAgent);
+  app.get('/api/agents', apiGetAgents);
+  app.post('/api/agents', apiRegisterAgent);
 
   // Done!
   app.listen(PORT);
