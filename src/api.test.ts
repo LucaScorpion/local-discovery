@@ -84,4 +84,33 @@ describe('api', (): void => {
       }
     });
   });
+
+  describe('DELETE /api/agents/:address', () => {
+    it('removes the agent', async (): Promise<void> => {
+      const agent = randomAgent();
+      registerAgent('::1', agent);
+      const remove = randomAgent();
+      registerAgent('::1', remove);
+
+      try {
+        await request(app).get('/api/agents').expect([agent, remove]);
+
+        await request(app)
+          .del(`/api/agents/${remove.address}`)
+          .expect(200)
+          .expect('Content-Type', 'application/json; charset=utf-8')
+          .expect([agent]);
+      } finally {
+        removeAgent('::1', agent.address);
+      }
+    });
+
+    it('does nothing if no agent with that address exists', async (): Promise<void> => {
+      await request(app)
+        .del('/api/agents/does.not.exist')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect([]);
+    });
+  });
 });
