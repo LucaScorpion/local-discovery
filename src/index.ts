@@ -1,5 +1,6 @@
 import express from 'express';
 import { Logger } from '@luca_scorpion/tinylogger';
+import { AddressInfo } from 'net';
 import { PORT } from './constants';
 import { apiGetAgents, apiRegisterAgent } from './api';
 import { cors } from './cors';
@@ -18,8 +19,10 @@ async function bootstrap(): Promise<void> {
   app.post('/api/agents', apiRegisterAgent);
 
   // Done!
-  app.listen(PORT);
-  log.info(`Discovery server running on port ${PORT}`);
+  const server = app.listen(PORT, () => {
+    const serverPort = (server.address() as AddressInfo).port;
+    log.info(`Discovery server running on port ${serverPort}`);
+  });
 }
 
 bootstrap().catch((err) => {
