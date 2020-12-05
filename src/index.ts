@@ -1,25 +1,17 @@
-import express from 'express';
 import { Logger } from '@luca_scorpion/tinylogger';
+import { AddressInfo } from 'net';
 import { PORT } from './constants';
-import { getAgents, registerAgent } from './agents';
-import { cors } from './cors';
+import { app } from './app';
 
 const log = new Logger('index');
 log.debug('Starting discovery server...');
 
 async function bootstrap(): Promise<void> {
-  // Start express.
-  const app = express();
-  app.use(express.json());
-  app.use(cors);
-
-  // API routes.
-  app.get('/api/agents', getAgents);
-  app.post('/api/agents', registerAgent);
-
-  // Done!
-  app.listen(PORT);
-  log.info(`Discovery server running on port ${PORT}`);
+  // Start the server.
+  const server = app.listen(PORT, () => {
+    const serverPort = (server.address() as AddressInfo).port;
+    log.info(`Discovery server running on port ${serverPort}`);
+  });
 }
 
 bootstrap().catch((err) => {
