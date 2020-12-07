@@ -38,7 +38,7 @@ describe('api', (): void => {
           .get('/api/agents')
           .expect(200)
           .expect('Content-Type', 'application/json; charset=utf-8')
-          .expect([agentOne, agentTwo]);
+          .expect([agentTwo, agentOne]);
       } finally {
         removeAgent('::1', agentOne.address);
         removeAgent('::1', agentTwo.address);
@@ -77,7 +77,7 @@ describe('api', (): void => {
           .send(newAgent)
           .expect(201)
           .expect('Content-Type', 'application/json; charset=utf-8')
-          .expect([otherAgent, newAgent]);
+          .expect([newAgent, otherAgent]);
       } finally {
         removeAgent('::1', newAgent.address);
         removeAgent('::1', otherAgent.address);
@@ -93,7 +93,7 @@ describe('api', (): void => {
       registerAgent('::1', remove);
 
       try {
-        await request(app).get('/api/agents').expect([agent, remove]);
+        await request(app).get('/api/agents').expect([remove, agent]);
 
         await request(app)
           .del(`/api/agents/${remove.address}`)

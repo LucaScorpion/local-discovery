@@ -63,7 +63,6 @@ export function registerAgent(publicIp: string, agent: AgentInfo): void {
   };
 
   // Add the new agent to the list, store it.
-  const newAgents = agents[publicIp] || [];
-  newAgents.push(agentWithTimeout);
-  agents[publicIp] = newAgents;
+  const currentAgents = agents[publicIp] || [];
+  agents[publicIp] = [agentWithTimeout, ...currentAgents];
 }
