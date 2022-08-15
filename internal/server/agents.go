@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"local-discovery/internal/discovery"
 	"net/http"
 )
@@ -16,7 +17,7 @@ func agents(reg *discovery.Registry) func(writer http.ResponseWriter, request *h
 		case http.MethodPost:
 			postAgent(reg, writer, request)
 		default:
-			writer.WriteHeader(405)
+			writer.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	}
 }
@@ -29,10 +30,30 @@ func getAgents(reg *discovery.Registry, writer http.ResponseWriter, request *htt
 		list = []*discovery.Agent{}
 	}
 
-	b, _ := json.Marshal(list)
-	writer.Write(b)
+	json.NewEncoder(writer).Encode(list)
 }
 
 func postAgent(reg *discovery.Registry, writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Created agent goes here"))
+	agentDto := &discovery.Agent{}
+	enc := json.NewEncoder(writer)
+
+	if err := json.NewDecoder(request.Body).Decode(agentDto); err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		enc.Encode(jsonErr{
+			Error: fmt.Sprintf("Invalid JSON: %v", err),
+		})
+		return
+	}
+
+	agent, err := reg.RegisterAgent(getRemoteIp(request), *agentDto)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		enc.Encode(jsonErr{
+			Error: fmt.Sprintf("Invalid agent: %v", err),
+		})
+		return
+	}
+
+	writer.WriteHeader(http.StatusCreated)
+	enc.Encode(agent)
 }

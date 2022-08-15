@@ -34,3 +34,7 @@ func getRemoteIp(request *http.Request) string {
 
 	return remoteAddr
 }
+
+type jsonErr struct {
+	Error string `json:"error"`
+}
