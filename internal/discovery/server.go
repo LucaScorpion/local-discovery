@@ -7,9 +7,10 @@ import (
 )
 
 func StartServer() {
+	reg := newRegistry()
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/agents", agents)
+	mux.HandleFunc("/api/agents", agents(reg))
 
 	if err := http.ListenAndServe(":4000", mux); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
