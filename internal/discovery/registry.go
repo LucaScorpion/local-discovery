@@ -32,7 +32,13 @@ func (reg *Registry) RegisterAgent(publicIp string, agent Agent) (*Agent, error)
 		agent.Info = map[string]any{}
 	}
 
+	// TODO: remove old agent if name and localAddress are both the same.
+
 	agent.registered = time.Now()
 	reg.agents[publicIp] = append(reg.agents[publicIp], &agent)
 	return &agent, nil
+}
+
+func (reg *Registry) RemoveAgent(publicIp string, agent Agent) {
+	// TODO
 }

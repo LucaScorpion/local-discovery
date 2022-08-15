@@ -4,11 +4,13 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/lucascorpion/local-discovery?sort=semver)](https://hub.docker.com/r/lucascorpion/local-discovery)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lucascorpion/local-discovery)](https://hub.docker.com/r/lucascorpion/local-discovery)
 
-A simple API which can be used to discover agents in a local network.
+A simple JSON API which can be used to discover agents in a local network.
 
 ## Using the API
 
 All endpoints only expose agents in the same network as the request origin, based on the remote client IP address.
+
+By default the API will start on port 4000.
 
 ### Agent Schema
 
@@ -21,7 +23,7 @@ All endpoints only expose agents in the same network as the request origin, base
 ### List the Agents
 
 Send a `GET` request to `/api/agents`.
-This will return a JSON list of known agent information:
+This will return a list of known agent information:
 
 ```json
 [
@@ -35,7 +37,7 @@ This will return a JSON list of known agent information:
 
 ### Register an Agent
 
-Send a `POST` request to `/api/agents`, with the agent information as JSON in the request body:
+Send a `POST` request to `/api/agents`, with the agent information in the request body:
 
 ```json
 {
@@ -45,22 +47,21 @@ Send a `POST` request to `/api/agents`, with the agent information as JSON in th
 }
 ```
 
-This will return the list of known agents in the local network (see "List the Agents" above).
+This will return the newly created agent.
 
 Note: if the agent address is the same as the address of a known agent, the known agent will be replaced with the new one.
 
 ### Remove an Agent
 
-Send a `DELETE` request to `/api/agents/:address`, where `:address` is the local address of the agent.
-If no agent with that address is registered, nothing happens. 
-This will return the list of known agents in the local network (see "List the Agents" above).
+Send a `DELETE` request to `/api/agents`, with the agent information in the request body:
 
-## Configuration
+```json
+{
+  "name": "agent",
+  "localAddress": "192.168.0.110:4000"
+}
+```
 
-The discovery server can be configured through environment variables.
-
-| Variable          | Default | Description |
-|-------------------|---------|-------------|
-| `LOG_LEVEL`       | `INFO`  | The log level (`DEBUG`, `INFO`, `WARN`, `ERROR` or `OFF`).
-| `PORT`            | 5000    | The port the server listens on.
-| `KEEP_AGENT_TIME` | 600     | The time (in seconds) to keep agents in the registry. 
+This will delete the agent whose `name` and `localAddress` match this info.
+If no such agent is found, nothing happens.
+This will return an empty.
