@@ -6,18 +6,23 @@ import (
 )
 
 func getRemoteIp(request *http.Request) string {
-	remoteAddr := request.RemoteAddr
+	remoteIp := request.RemoteAddr
 
 	// Check if the address is an IPv6 address with port, e.g.: "[::1]:4000"
-	if remoteAddr[0] == '[' {
-		endIpIndex := strings.IndexRune(remoteAddr, ']')
-		return remoteAddr[1:endIpIndex]
+	if remoteIp[0] == '[' {
+		endIpIndex := strings.IndexRune(remoteIp, ']')
+		remoteIp = remoteIp[1:endIpIndex]
 	}
 
 	// Check if the address is an IPv4 address with port, e.g.: "127.0.0.1:4000"
-	if parts := strings.SplitN(remoteAddr, ":", 3); len(parts) == 2 {
-		return parts[0]
+	if parts := strings.SplitN(remoteIp, ":", 3); len(parts) == 2 {
+		remoteIp = parts[0]
 	}
 
-	return remoteAddr
+	// Consolidate localhost addresses.
+	if remoteIp == "::1" {
+		remoteIp = "127.0.0.1"
+	}
+
+	return remoteIp
 }
