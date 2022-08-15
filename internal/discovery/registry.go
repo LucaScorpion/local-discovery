@@ -5,19 +5,19 @@ import (
 	"time"
 )
 
-type registry struct {
+type Registry struct {
 	agents map[string][]*Agent
 }
 
-func newRegistry() *registry {
-	return &registry{}
+func NewRegistry() *Registry {
+	return &Registry{}
 }
 
-func (reg *registry) getAgents(publicIp string) []*Agent {
+func (reg *Registry) GetAgents(publicIp string) []*Agent {
 	return reg.agents[publicIp]
 }
 
-func (reg *registry) registerAgent(publicIp string, agent Agent) error {
+func (reg *Registry) registerAgent(publicIp string, agent Agent) error {
 	// Validate the agent info.
 	if len(agent.Name) == 0 {
 		return errors.New("name should not be empty")

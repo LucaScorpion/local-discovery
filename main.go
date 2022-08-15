@@ -1,7 +1,9 @@
 package main
 
-import "local-discovery/internal/discovery"
+import (
+	"local-discovery/internal/server"
+)
 
 func main() {
-	discovery.StartServer()
+	server.StartServer()
 }

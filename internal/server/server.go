@@ -1,13 +1,14 @@
-package discovery
+package server
 
 import (
+	"local-discovery/internal/discovery"
 	"log"
 	"net/http"
 	"strings"
 )
 
 func StartServer() {
-	reg := newRegistry()
+	reg := discovery.NewRegistry()
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/agents", agents(reg))
@@ -17,7 +18,9 @@ func StartServer() {
 	}
 }
 
-func getRemoteIp(remoteAddr string) string {
+func getRemoteIp(request *http.Request) string {
+	remoteAddr := request.RemoteAddr
+
 	// Check if the address is an IPv6 address with port, e.g.: "[::1]:4000"
 	if remoteAddr[0] == '[' {
 		endIpIndex := strings.IndexRune(remoteAddr, ']')
