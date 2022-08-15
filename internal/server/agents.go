@@ -7,22 +7,22 @@ import (
 	"net/http"
 )
 
-func agents(reg *discovery.Registry) func(writer http.ResponseWriter, request *http.Request) {
-	return func(writer http.ResponseWriter, request *http.Request) {
+func agents(reg *discovery.Registry) handlerWithErrorFunc {
+	return func(writer http.ResponseWriter, request *http.Request) error {
 		writer.Header().Set("Content-Type", "application/json")
 
 		switch request.Method {
 		case http.MethodGet:
-			getAgents(reg, writer, request)
+			return getAgents(reg, writer, request)
 		case http.MethodPost:
-			postAgent(reg, writer, request)
+			return postAgent(reg, writer, request)
 		default:
-			writer.WriteHeader(http.StatusMethodNotAllowed)
+			return newHttpError(http.StatusMethodNotAllowed, "")
 		}
 	}
 }
 
-func getAgents(reg *discovery.Registry, writer http.ResponseWriter, request *http.Request) {
+func getAgents(reg *discovery.Registry, writer http.ResponseWriter, request *http.Request) error {
 	list := reg.GetAgents(getRemoteIp(request))
 
 	// Make sure the list is always a list, not nil.
@@ -31,29 +31,23 @@ func getAgents(reg *discovery.Registry, writer http.ResponseWriter, request *htt
 	}
 
 	json.NewEncoder(writer).Encode(list)
+	return nil
 }
 
-func postAgent(reg *discovery.Registry, writer http.ResponseWriter, request *http.Request) {
+func postAgent(reg *discovery.Registry, writer http.ResponseWriter, request *http.Request) error {
 	agentDto := &discovery.Agent{}
 	enc := json.NewEncoder(writer)
 
 	if err := json.NewDecoder(request.Body).Decode(agentDto); err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		enc.Encode(jsonErr{
-			Error: fmt.Sprintf("Invalid JSON: %v", err),
-		})
-		return
+		return newHttpError(http.StatusBadRequest, fmt.Sprintf("Invalid JSON: %v", err))
 	}
 
 	agent, err := reg.RegisterAgent(getRemoteIp(request), *agentDto)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		enc.Encode(jsonErr{
-			Error: fmt.Sprintf("Invalid agent: %v", err),
-		})
-		return
+		return newHttpError(http.StatusBadRequest, fmt.Sprintf("Invalid agent: %v", err))
 	}
 
 	writer.WriteHeader(http.StatusCreated)
 	enc.Encode(agent)
+	return nil
 }

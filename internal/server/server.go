@@ -1,40 +1,42 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
 	"local-discovery/internal/discovery"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func StartServer() {
 	reg := discovery.NewRegistry()
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/api/agents", agents(reg))
+	mux.HandleFunc("/api/agents", handleErrors(agents(reg)))
 
 	if err := http.ListenAndServe(":4000", mux); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
 
-func getRemoteIp(request *http.Request) string {
-	remoteAddr := request.RemoteAddr
+type handlerWithErrorFunc func(http.ResponseWriter, *http.Request) error
 
-	// Check if the address is an IPv6 address with port, e.g.: "[::1]:4000"
-	if remoteAddr[0] == '[' {
-		endIpIndex := strings.IndexRune(remoteAddr, ']')
-		return remoteAddr[1:endIpIndex]
+func handleErrors(handler handlerWithErrorFunc) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		err := handler(writer, request)
+		if err == nil {
+			return
+		}
+
+		httpErr := httpError{
+			Status:  http.StatusInternalServerError,
+			Message: fmt.Sprintf("An unexpected error occurred: %v", err),
+		}
+		if cast, ok := err.(httpError); ok {
+			httpErr = cast
+		}
+
+		writer.WriteHeader(httpErr.Status)
+		json.NewEncoder(writer).Encode(httpErr)
 	}
-
-	// Check if the address is an IPv4 address with port, e.g.: "127.0.0.1:4000"
-	if parts := strings.SplitN(remoteAddr, ":", 3); len(parts) == 2 {
-		return parts[0]
-	}
-
-	return remoteAddr
-}
-
-type jsonErr struct {
-	Error string `json:"error"`
 }
