@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Local Discovery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+    <h1>Local Discovery</h1>
+    {{range .Agents}}
+        <div class="agent">
+            <div class="name">{{.Name}}</div>
+            <div class="address">{{.LocalAddress}}</div>
+        </div>
+    {{end}}
+</main>
+</body>
+</html>
