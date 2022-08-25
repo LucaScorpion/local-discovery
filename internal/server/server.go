@@ -16,6 +16,7 @@ func StartServer() {
 	mux.HandleFunc("/api/agents", handleErrors(agents(reg)))
 	mux.HandleFunc("/", handleErrors(staticFiles(reg)))
 
+	log.Println("Server starting on port 4000")
 	if err := http.ListenAndServe(":4000", mux); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
