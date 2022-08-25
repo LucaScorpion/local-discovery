@@ -4,13 +4,16 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/lucascorpion/local-discovery?sort=semver)](https://hub.docker.com/r/lucascorpion/local-discovery)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lucascorpion/local-discovery)](https://hub.docker.com/r/lucascorpion/local-discovery)
 
-A simple JSON API which can be used to discover agents in a local network.
+A simple service with a JSON API which can be used to discover agents in a local network.
 
-## Using the API
+![Screenshot of the Local Discovery frontend](screenshot.png)
+
+## How Does it Work?
 
 All endpoints only expose agents in the same network as the request origin, based on the remote client IP address.
+That way you can never see or manipulate other agents than your own.
 
-By default the API will start on port 4000.
+## API
 
 ### Agent Schema
 
@@ -23,7 +26,7 @@ By default the API will start on port 4000.
 ### List the Agents
 
 Send a `GET` request to `/api/agents`.
-This will return a list of known agent information:
+This returns a list of known agent information:
 
 ```json
 [
@@ -47,9 +50,9 @@ Send a `POST` request to `/api/agents`, with the agent information in the reques
 }
 ```
 
-This will return the newly created agent.
+This returns the newly created agent.
 
-Note: if the agent address is the same as the address of a known agent, the known agent will be replaced with the new one.
+**Note:** if the agent `name` and `localAddress` are the same as a known agent, the known agent will be replaced with the new one.
 
 ### Remove an Agent
 
@@ -62,6 +65,6 @@ Send a `DELETE` request to `/api/agents`, with the agent information in the requ
 }
 ```
 
-This will delete the agent whose `name` and `localAddress` match this info.
+This deletes the agent whose `name` and `localAddress` match this info.
 If no such agent is found, nothing happens.
-This will return an empty.
+This returns an empty response.
