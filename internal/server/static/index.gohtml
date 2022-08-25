@@ -11,8 +11,13 @@
     <h1>Local Discovery</h1>
     {{range .Agents}}
         <div class="agent">
-            <div class="name">{{.Name}}</div>
-            <div class="address">{{.LocalAddress}}</div>
+            <div class="info">
+                <div class="name">{{.Name}}</div>
+                <div class="address">{{.LocalAddress}}</div>
+            </div>
+            <button type="button" onclick="navigator.clipboard.writeText('{{.LocalAddress}}')">
+                <img src="copy.svg" alt="Copy address">
+            </button>
         </div>
     {{end}}
 </main>
