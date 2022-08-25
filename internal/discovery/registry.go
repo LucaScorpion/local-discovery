@@ -2,12 +2,13 @@ package discovery
 
 import (
 	"errors"
+	"sync"
 	"time"
 )
 
 type Registry struct {
-	// TODO: add mutex lock
-	agents map[string][]*Agent
+	agents     map[string][]*Agent
+	agentsLock sync.Mutex
 }
 
 func NewRegistry() *Registry {
@@ -17,6 +18,9 @@ func NewRegistry() *Registry {
 }
 
 func (reg *Registry) GetAgents(publicIp string) []*Agent {
+	reg.agentsLock.Lock()
+	defer reg.agentsLock.Unlock()
+
 	return reg.agents[publicIp]
 }
 
@@ -33,8 +37,11 @@ func (reg *Registry) RegisterAgent(publicIp string, agent Agent) (*Agent, error)
 		agent.Info = map[string]any{}
 	}
 
+	reg.agentsLock.Lock()
+	defer reg.agentsLock.Unlock()
+
 	// Remove agents where the name and local address are the same as the new agent.
-	reg.RemoveAgent(publicIp, agent)
+	reg.doRemoveAgent(publicIp, agent)
 
 	agent.registered = time.Now()
 	reg.agents[publicIp] = append(reg.agents[publicIp], &agent)
@@ -42,6 +49,15 @@ func (reg *Registry) RegisterAgent(publicIp string, agent Agent) (*Agent, error)
 }
 
 func (reg *Registry) RemoveAgent(publicIp string, agent Agent) {
+	reg.agentsLock.Lock()
+	defer reg.agentsLock.Unlock()
+
+	reg.doRemoveAgent(publicIp, agent)
+}
+
+func (reg *Registry) doRemoveAgent(publicIp string, agent Agent) {
+	// Here we already have a lock.
+
 	newAgents := make([]*Agent, 0)
 	for _, check := range reg.agents[publicIp] {
 		if !IsSameAgent(agent, *check) {
