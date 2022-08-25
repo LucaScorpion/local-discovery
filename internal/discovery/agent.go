@@ -8,3 +8,7 @@ type Agent struct {
 	Info         map[string]any `json:"info"`
 	registered   time.Time
 }
+
+func IsSameAgent(a Agent, b Agent) bool {
+	return a.Name == b.Name && a.LocalAddress == b.LocalAddress
+}

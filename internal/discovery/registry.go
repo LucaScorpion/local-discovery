@@ -6,6 +6,7 @@ import (
 )
 
 type Registry struct {
+	// TODO: add mutex lock
 	agents map[string][]*Agent
 }
 
@@ -32,7 +33,8 @@ func (reg *Registry) RegisterAgent(publicIp string, agent Agent) (*Agent, error)
 		agent.Info = map[string]any{}
 	}
 
-	// TODO: remove old agent if name and localAddress are both the same.
+	// Remove agents where the name and local address are the same as the new agent.
+	reg.RemoveAgent(publicIp, agent)
 
 	agent.registered = time.Now()
 	reg.agents[publicIp] = append(reg.agents[publicIp], &agent)
@@ -40,5 +42,11 @@ func (reg *Registry) RegisterAgent(publicIp string, agent Agent) (*Agent, error)
 }
 
 func (reg *Registry) RemoveAgent(publicIp string, agent Agent) {
-	// TODO
+	newAgents := make([]*Agent, 0)
+	for _, check := range reg.agents[publicIp] {
+		if !IsSameAgent(agent, *check) {
+			newAgents = append(newAgents, check)
+		}
+	}
+	reg.agents[publicIp] = newAgents
 }
