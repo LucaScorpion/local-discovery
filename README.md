@@ -4,68 +4,67 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/lucascorpion/local-discovery?sort=semver)](https://hub.docker.com/r/lucascorpion/local-discovery)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lucascorpion/local-discovery)](https://hub.docker.com/r/lucascorpion/local-discovery)
 
-A simple API which can be used to discover agents in a local network.
+A simple service with a JSON API which can be used to discover agents in a local network.
 
-## Using the API
+![Screenshot of the Local Discovery frontend](screenshot.png)
+
+## How Does it Work?
 
 All endpoints only expose agents in the same network as the request origin, based on the remote client IP address.
+That way you can never see or manipulate other agents than your own.
+
+## API
 
 ### Agent Schema
 
-| Attribute  | Description |
-|------------|-------------|
-| `name`     | The name of the agent application. This will likely be the same for all agents.
-| `version`  | The version of the agent application.
-| `address`  | The local address (IP and port) at which the agent is running.
-| `platform` | The platform the agent is running on, e.g. `windows`, `linux` or `mac`.
-| `hostname` | The name of the host the agent is running on.
+| Attribute      | Description |
+|----------------|-------------|
+| `name`         | The name of the agent application.
+| `localAddress` | The local address at which the agent is running.
+| `info`         | A freeform object containing application-specific info about the agent.
 
 ### List the Agents
 
-Send a `GET` request to `/api/agents`. This will return a JSON list of known agent information:
+Send a `GET` request to `/api/agents`.
+This returns a list of known agent information:
 
 ```json
 [
   {
     "name": "agent",
-    "version": "1.0.0",
-    "address": "192.168.0.110:4000",
-    "platform": "windows",
-    "hostname": "my-pc"
+    "localAddress": "192.168.0.110:4000",
+    "info": {}
   }
 ]
 ```
 
 ### Register an Agent
 
-Send a `POST` request to `/api/agents`, with the agent information as JSON in the request body:
+Send a `POST` request to `/api/agents`, with the agent information in the request body:
 
 ```json
 {
   "name": "agent",
-  "version": "1.0.0",
-  "address": "192.168.0.110:4000",
-  "platform": "windows",
-  "hostname": "my-pc"
+  "localAddress": "192.168.0.110:4000",
+  "info": {}
 }
 ```
 
-This will return the list of known agents in the local network (see "List the Agents" above).
+This returns the newly created agent.
 
-If the agent address is the same as the address of a known agent, the known agent will be replaced with the new one.
+**Note:** if the agent `name` and `localAddress` are the same as a known agent, the known agent will be replaced with the new one.
 
-### Remove an agent
+### Remove an Agent
 
-Send a `DELETE` request to `/api/agents/:address`, where `:address` is the local address of the agent. If no agent with that address is registered, nothing happens. 
+Send a `DELETE` request to `/api/agents`, with the agent information in the request body:
 
-This will return the list of known agents in the local network (see "List the Agents" above).
+```json
+{
+  "name": "agent",
+  "localAddress": "192.168.0.110:4000"
+}
+```
 
-## Configuration
-
-The discovery server can be configured through environment variables.
-
-| Variable          | Default | Description |
-|-------------------|---------|-------------|
-| `LOG_LEVEL`       | `INFO`  | The log level (`DEBUG`, `INFO`, `WARN`, `ERROR` or `OFF`).
-| `PORT`            | 5000    | The port the server listens on.
-| `KEEP_AGENT_TIME` | 600     | The time (in seconds) to keep agents in the registry. 
+This deletes the agent whose `name` and `localAddress` match this info.
+If no such agent is found, nothing happens.
+This returns an empty response.
